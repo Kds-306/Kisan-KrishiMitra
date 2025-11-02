@@ -1,0 +1,676 @@
+{% extends "base.html" %}
+{% block title %}Registered Farmers - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="farmers-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="title-container">
+      <h1>👨‍🌾 Registered Farmers</h1>
+      <p class="subtitle">Manage and view all registered farmers in the system</p>
+    </div>
+    <div class="stats-badge">
+      <span class="count">{{ farmers|length if farmers else 0 }}</span>
+      <span class="label">Total Farmers</span>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <span class="flash-icon">
+              {% if category == 'success' %}✅{% else %}❌{% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% if farmers %}
+  <!-- Search and Controls Section -->
+  <div class="controls-section">
+    <div class="search-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search farmers by name or mobile number...">
+      </div>
+    </div>
+    <div class="actions-container">
+      <button class="btn-export" onclick="exportToExcel()">
+        📊 Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Farmers Table -->
+  <div class="table-container">
+    <table id="farmerTable" class="modern-table">
+      <thead>
+        <tr>
+          <th class="col-id">
+            <span>ID</span>
+          </th>
+          <th class="col-name">
+            <span>👤 Name</span>
+          </th>
+          <th class="col-mobile">
+            <span>📱 Mobile</span>
+          </th>
+          <th class="col-password">
+            <span>🔑 Password</span>
+          </th>
+          <th class="col-actions">
+            <span>⚡ Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in farmers %}
+        <tr class="table-row">
+          <td class="farmer-id">
+            <span class="id-badge">#{{ f['id'] }}</span>
+          </td>
+          <td class="farmer-name">
+            <div class="name-container">
+              <span class="name">{{ f['name'] }}</span>
+            </div>
+          </td>
+          <td class="farmer-mobile">
+            <span class="mobile-number">{{ f['mobile'] }}</span>
+          </td>
+          <td class="farmer-password">
+            <div class="password-container">
+              <span class="password-text">{{ f['password'] }}</span>
+              <button class="btn-copy" onclick="copyToClipboard('{{ f['password'] }}')" title="Copy password">
+                📋
+              </button>
+            </div>
+          </td>
+          <td class="farmer-actions">
+            <div class="actions-group">
+              <a href="{{ url_for('delete_farmer', farmer_id=f['id']) }}"
+                 class="btn-delete"
+                 onclick="return confirm('Are you sure you want to delete farmer {{ f['name'] }} (ID: {{ f['id'] }})? This action cannot be undone.')">
+                <span class="btn-icon">🗑️</span>
+                Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Table Footer -->
+  <div class="table-footer">
+    <div class="footer-info">
+      Showing <strong>{{ farmers|length }}</strong> registered farmers
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="empty-state">
+    <div class="empty-icon">👨‍🌾</div>
+    <h3>No Farmers Registered Yet</h3>
+    <p>There are no farmers currently registered in the system.</p>
+    <div class="empty-actions">
+      <a href="{{ url_for('dashboard') }}" class="btn-primary">
+        ← Return to Dashboard
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Back Button -->
+  <div class="navigation-section">
+    <a href="{{ url_for('dashboard') }}" class="btn-back">
+      <span class="btn-icon">←</span>
+      Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  // Search functionality
+  document.getElementById('searchInput')?.addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#farmerTable tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const name = row.cells[1].textContent.toLowerCase();
+      const mobile = row.cells[2].textContent.toLowerCase();
+      const isVisible = name.includes(filter) || mobile.includes(filter);
+      row.style.display = isVisible ? '' : 'none';
+
+      if (isVisible) visibleCount++;
+    });
+
+    // Update footer count
+    const footerInfo = document.querySelector('.footer-info');
+    if (footerInfo) {
+      footerInfo.innerHTML = `Showing <strong>${visibleCount}</strong> of {{ farmers|length }} registered farmers`;
+    }
+  });
+
+  // Copy to clipboard function
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      // Show temporary feedback
+      const event = new Event('copySuccess');
+      document.dispatchEvent(event);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+
+  // Copy success feedback
+  document.addEventListener('copySuccess', () => {
+    // You can add a toast notification here if needed
+    console.log('Password copied to clipboard');
+  });
+
+  // Export to Excel (placeholder)
+  function exportToExcel() {
+    alert('Export to Excel functionality would be implemented here!');
+    // Implementation for Excel export would go here
+  }
+
+  // Auto-hide flash messages after 5 seconds
+  setTimeout(function() {
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(function(message) {
+      message.style.animation = 'slideOut 0.3s ease forwards';
+      setTimeout(() => {
+        message.style.display = 'none';
+      }, 300);
+    });
+  }, 5000);
+</script>
+
+<!-- Modern Styling -->
+<style>
+  .farmers-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fffd 100%);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow:
+      0 10px 40px rgba(46, 125, 50, 0.1),
+      0 2px 10px rgba(46, 125, 50, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .farmers-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf50, #2e7d32, #1b5e20);
+  }
+
+  /* Header Section */
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e8f5e9;
+  }
+
+  .title-container h1 {
+    font-size: 2.5em;
+    color: #1b5e20;
+    margin: 0;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2e7d32, #4caf50);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: #666;
+    font-size: 1.1em;
+    margin: 8px 0 0 0;
+    font-weight: 400;
+  }
+
+  .stats-badge {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+  }
+
+  .stats-badge .count {
+    display: block;
+    font-size: 2.2em;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .stats-badge .label {
+    font-size: 0.9em;
+    opacity: 0.9;
+  }
+
+  /* Flash Messages */
+  .flash-messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+  }
+
+  .flash-message {
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+  }
+
+  .flash-message.success {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    border-left: 4px solid #1b5e20;
+  }
+
+  .flash-message.error {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    border-left: 4px solid #b71c1c;
+  }
+
+  .flash-icon {
+    font-size: 1.2em;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Controls Section */
+  .controls-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+  }
+
+  .search-container {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 1.1em;
+    color: #666;
+    z-index: 2;
+  }
+
+  #searchInput {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  }
+
+  .actions-container {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-export {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+  }
+
+  /* Table Styles */
+  .table-container {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+  }
+
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+  }
+
+  .modern-table th {
+    background: linear-gradient(135deg, #f8fffd, #e8f5e9);
+    padding: 20px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #2e7d32;
+    border-bottom: 2px solid #e8f5e9;
+  }
+
+  .modern-table th span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modern-table td {
+    padding: 18px 16px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s ease;
+  }
+
+  .table-row:hover td {
+    background: #f8fffd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.1);
+  }
+
+  /* Column specific styles */
+  .col-id { width: 80px; }
+  .col-name { width: 25%; }
+  .col-mobile { width: 20%; }
+  .col-password { width: 25%; }
+  .col-actions { width: 15%; }
+
+  .farmer-id .id-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85em;
+  }
+
+  .name-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .name {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .mobile-number {
+    color: #666;
+    font-family: 'Courier New', monospace;
+  }
+
+  .password-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .password-text {
+    font-family: 'Courier New', monospace;
+    color: #666;
+  }
+
+  .btn-copy {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+  }
+
+  .btn-copy:hover {
+    background: #f5f5f5;
+    transform: scale(1.1);
+  }
+
+  /* Action Buttons */
+  .actions-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-delete {
+    background: linear-gradient(135deg, #ff5252, #d32f2f);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 82, 82, 0.4);
+  }
+
+  .btn-icon {
+    font-size: 1em;
+  }
+
+  /* Table Footer */
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #666;
+  }
+
+  .empty-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+
+  .empty-state h3 {
+    color: #555;
+    margin-bottom: 12px;
+    font-size: 1.5em;
+  }
+
+  .empty-state p {
+    margin-bottom: 30px;
+    font-size: 1.1em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  }
+
+  /* Navigation */
+  .navigation-section {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #f0f0f0;
+  }
+
+  .btn-back {
+    background: linear-gradient(135deg, #757575, #616161);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(117, 117, 117, 0.4);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .farmers-container {
+      padding: 20px;
+      margin: 15px;
+    }
+
+    .header-section {
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .title-container h1 {
+      font-size: 2em;
+    }
+
+    .controls-section {
+      flex-direction: column;
+    }
+
+    .search-container {
+      max-width: 100%;
+    }
+
+    .modern-table {
+      font-size: 0.85em;
+    }
+
+    .modern-table th,
+    .modern-table td {
+      padding: 12px 8px;
+    }
+
+    .btn-delete {
+      padding: 6px 12px;
+      font-size: 0.8em;
+    }
+
+    .flash-messages {
+      position: relative;
+      top: 0;
+      right: 0;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .farmers-container {
+      padding: 15px;
+    }
+
+    .modern-table {
+      display: block;
+      overflow-x: auto;
+    }
+
+    .actions-group {
+      flex-direction: column;
+    }
+
+    .btn-delete {
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}

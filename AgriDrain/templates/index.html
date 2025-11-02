@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Home - Agri Drain{% endblock %}
+{% block content %}
+
+<!-- 🌾 Image Slider -->
+<div class="image-slider">
+  <img src="https://icid-ciid.org/uploads/banner/1632396440_banner04.jpg" class="active" alt="Banner 1">
+  <img src="https://icid-ciid.org/uploads/banner/1734679107_Home-page-banner-2025_1.jpg" alt="Banner 2">
+  <img src="https://icid-ciid.org/uploads/banner/1632396373_banner03.jpg" alt="Banner 3">
+</div>
+
+<!-- 🌊 Vision Box -->
+<div class="vision-box">
+  <h3>👁️ Vision</h3>
+  <p>🌿 A water-secure world free of poverty and hunger<br>through sustainable rural development.</p>
+</div>
+
+<!-- 🌿 Welcome Message -->
+<section class="welcome-section">
+  <h2>Welcome to KrishiMitra!</h2>
+  <p>
+      <strong>The Kisan Assistance System </strong> empowers farmers with intelligent crop-specific irrigation solutions for enhanced productivity and sustainable farming.
+      Our platform provides data-driven insights to optimize water usage, prevent waterlogging, and ensure perfect moisture levels for each crop type.
+      Agricultural drainage efficiently removes excess water from soil to improve crop growth, prevent root diseases, and enhance soil aeration.
+      Proper irrigation management helps control salinity, boosts yield stability, and enables timely field operations.
+      From surface ditches to advanced subsurface systems, we promote sustainable land and water management tailored to your crops needs.<br>
+      Together, we're making farming smarter, water usage efficient, and crops healthier!
+  </p>
+</section>
+
+<!-- 🌾 Why Choose Us Section -->
+<section class="why-us">
+  <h2>Why Choose KrishiMitra?</h2>
+  <div class="features">
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/3076/3076743.png" alt="Smart Technology">
+      <h3>Smart Water Management</h3>
+      <p>We integrate data-driven insights and IoT-based systems to optimize irrigation and reduce water wastage.</p>
+    </div>
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Farmer Support">
+      <h3>Farmer-Centric Approach</h3>
+      <p>Our system is designed for farmers — simple, reliable, and focused on improving productivity.</p>
+    </div>
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Sustainability">
+      <h3>Eco-Friendly Solutions</h3>
+      <p>We promote sustainable farming by conserving water and maintaining soil health for future generations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 📰 Latest Updates -->
+<section class="news-section">
+  <h2>Latest Updates 📰</h2>
+  <div class="news-cards">
+    <div class="news-card">
+      <h4>💧 New Smart Drip System Launch</h4>
+      <p>Our latest drip system uses 30% less water while improving crop yield efficiency across regions.</p>
+    </div>
+    <div class="news-card">
+      <h4>🌿 Agri Drain Workshop 2025</h4>
+      <p>Join our hands-on training on sustainable water practices for rural farmers — registrations open!</p>
+    </div>
+    <div class="news-card">
+      <h4>🚜 Success Story</h4>
+      <p>Farmer Suresh from Maharashtra doubled his crop yield after adopting Agri Drain management tools.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  let currentIndex = 0;
+  const banners = document.querySelectorAll('.image-slider img');
+
+  if (banners.length > 0) {
+    banners[0].classList.add('active');
+    setInterval(() => {
+      banners[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % banners.length;
+      banners[currentIndex].classList.add('active');
+    }, 4000);
+  }
+});
+</script>
+
+<style>
+/* 🌾 Image Slider */
+.image-slider {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+
+.image-slider img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+.image-slider img.active { opacity: 1; }
+
+/* 🌊 Vision Box */
+.vision-box {
+background: white(46, 125, 50, 0.75);
+  padding: 25px;
+  border-radius: 15px;
+  margin: 30px auto;
+  text-align: center;
+  max-width: 700px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* 🌿 Welcome Section */
+.welcome-section {
+  text-align: center;
+  background: #f9fbe7;
+  padding: 50px 20px;
+  border-top: 2px solid #c5e1a5;
+}
+.welcome-section h2 { color: #2e7d32; font-size: 2em; margin-bottom: 15px; }
+.welcome-section p { color: #4e342e; line-height: 1.7; max-width: 900px; margin: 0 auto; }
+
+/* 🌾 Why Choose Us */
+.why-us {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+}
+.why-us h2 { color: #1b5e20; margin-bottom: 40px; }
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+.feature {
+  background: #e8f5e9;
+  padding: 25px;
+  border-radius: 15px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+.feature:hover { transform: translateY(-8px); }
+.feature img { width: 70px; margin-bottom: 15px; }
+
+
+/* 📰 News Section */
+.news-section {
+  background: #f1f8e9;
+  padding: 60px 30px;
+  text-align: center;
+}
+.news-section h2 { color: #2e7d32; margin-bottom: 30px; }
+.news-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+}
+.news-card {
+  background: white;
+  border-radius: 12px;
+  width: 300px;
+  padding: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  text-align: left;
+  transition: transform 0.3s ease;
+}
+.news-card:hover { transform: translateY(-6px); }
+.news-card h4 { color: #33691e; margin-bottom: 8px; }
+.news-card p { color: #555; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .features, .impact-stats, .news-cards { flex-direction: column; align-items: center; }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,766 @@
+{% extends "base.html" %}
+{% block title %}Analytics Reports - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+  <!-- Header Section with Stats -->
+  <div class="reports-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>📊 Agricultural Analytics</h1>
+        <p class="subtitle">Data-driven insights for smarter farming decisions</p>
+      </div>
+      <div class="stats-overview">
+        <div class="stat-card">
+          <div class="stat-icon">🌱</div>
+          <div class="stat-info">
+            <span class="stat-number" id="soilTypesCount">0</span>
+            <span class="stat-label">Soil Types</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌾</div>
+          <div class="stat-info">
+            <span class="stat-number" id="cropVarietiesCount">0</span>
+            <span class="stat-label">Crop Varieties</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <span class="stat-number" id="totalRecords">0</span>
+            <span class="stat-label">Total Records</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Soil Analytics Section -->
+  <section class="analytics-section">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon">🌱</span>
+        <h2>Soil Type Distribution</h2>
+      </div>
+      <div class="section-actions">
+        <button class="btn-download" onclick="downloadChart('soilBarChart', 'soil-analysis.png')">
+          <span>📥 Download Report</span>
+        </button>
+      </div>
+    </div>
+
+    {% if soil_data and soil_data|length > 0 %}
+    <div class="charts-grid">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>📊 Distribution Overview</h3>
+          <span class="chart-subtitle">Soil types by usage frequency</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="soilBarChart"></canvas>
+        </div>
+        <div class="chart-footer">
+          <div class="chart-stats">
+            <span class="stat">Most Common: <strong id="mostCommonSoil">Loading...</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>🥧 Composition Analysis</h3>
+          <span class="chart-subtitle">Percentage distribution</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="soilPieChart"></canvas>
+        </div>
+        <div class="chart-footer">
+          <div class="chart-stats">
+            <span class="stat">Total Samples: <strong id="totalSoilSamples">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-data-message">
+      <div class="no-data-icon">🌱</div>
+      <h3>No Soil Data Available</h3>
+      <p>Soil type data will appear here once farmers start submitting their farm information.</p>
+      <a href="{{ url_for('dashboard') }}" class="btn-primary">
+        <span class="btn-icon">👀</span>
+        Check Farmer Submissions
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Crop Analytics Section -->
+  <section class="analytics-section">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon">🌾</span>
+        <h2>Crop Type Analysis</h2>
+      </div>
+      <div class="section-actions">
+        <button class="btn-download" onclick="downloadChart('cropBarChart', 'crop-analysis.png')">
+          <span>📥 Download Report</span>
+        </button>
+      </div>
+    </div>
+
+    {% if crop_data and crop_data|length > 0 %}
+    <div class="charts-grid">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>📈 Popularity Trends</h3>
+          <span class="chart-subtitle">Crop selection frequency</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="cropBarChart"></canvas>
+        </div>
+        <div class="chart-footer">
+          <div class="chart-stats">
+            <span class="stat">Top Crop: <strong id="topCrop">Loading...</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>📋 Crop Portfolio</h3>
+          <span class="chart-subtitle">Market share distribution</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="cropPieChart"></canvas>
+        </div>
+        <div class="chart-footer">
+          <div class="chart-stats">
+            <span class="stat">Total Plantings: <strong id="totalCropPlantings">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-data-message">
+      <div class="no-data-icon">🌾</div>
+      <h3>No Crop Data Available</h3>
+      <p>Crop data will appear here once farmers start selecting crops for their farms.</p>
+      <a href="{{ url_for('dashboard') }}" class="btn-primary">
+        <span class="btn-icon">👀</span>
+        Check Farmer Submissions
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Action Buttons -->
+  <div class="action-section">
+    <div class="action-buttons">
+      <a href="{{ url_for('dashboard') }}" class="btn-primary">
+        <span class="btn-icon">←</span>
+        Back to Dashboard
+      </a>
+      <button class="btn-secondary" onclick="generateFullReport()">
+        <span class="btn-icon">📄</span>
+        Generate Full Report
+      </button>
+      <button class="btn-tertiary" onclick="shareAnalytics()">
+        <span class="btn-icon">🔗</span>
+        Share Insights
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Sample data for demonstration - Remove this when your backend data works
+  const sampleSoilData = [
+    {"soil_type": "Black Soil", "count": 45},
+    {"soil_type": "Red Soil", "count": 32},
+    {"soil_type": "Alluvial Soil", "count": 28},
+    {"soil_type": "Laterite Soil", "count": 15},
+    {"soil_type": "Marshy and Peaty Soil", "count": 8}
+  ];
+
+  const sampleCropData = [
+    {"crop": "Rice", "count": 38},
+    {"crop": "Wheat", "count": 35},
+    {"crop": "Cotton", "count": 22},
+    {"crop": "Sugarcane", "count": 18},
+    {"crop": "Groundnut", "count": 15},
+    {"crop": "Maize", "count": 12},
+    {"crop": "Pulses", "count": 10}
+  ];
+
+  // Use backend data if available, otherwise use sample data
+  const soilData = {{ soil_data | tojson | default(sampleSoilData) }};
+  const cropData = {{ crop_data | tojson | default(sampleCropData) }};
+
+  // Update statistics
+  document.getElementById('soilTypesCount').textContent = soilData.length;
+  document.getElementById('cropVarietiesCount').textContent = cropData.length;
+  document.getElementById('totalRecords').textContent =
+    soilData.reduce((sum, item) => sum + item.count, 0) +
+    cropData.reduce((sum, item) => sum + item.count, 0);
+
+  // Update soil statistics
+  if (soilData.length > 0) {
+    const mostCommonSoil = soilData.reduce((max, item) => item.count > max.count ? item : max, soilData[0]);
+    document.getElementById('mostCommonSoil').textContent = mostCommonSoil.soil_type;
+    document.getElementById('totalSoilSamples').textContent = soilData.reduce((sum, item) => sum + item.count, 0);
+  }
+
+  // Update crop statistics
+  if (cropData.length > 0) {
+    const topCrop = cropData.reduce((max, item) => item.count > max.count ? item : max, cropData[0]);
+    document.getElementById('topCrop').textContent = topCrop.crop;
+    document.getElementById('totalCropPlantings').textContent = cropData.reduce((sum, item) => sum + item.count, 0);
+  }
+
+  const soilLabels = soilData.map(row => row.soil_type);
+  const soilCounts = soilData.map(row => row.count);
+
+  const cropLabels = cropData.map(row => row.crop);
+  const cropCounts = cropData.map(row => row.count);
+
+  // Enhanced color palettes
+  const soilBarColors = [
+    'rgba(139, 69, 19, 0.9)',   // Rich Brown
+    'rgba(160, 82, 45, 0.9)',   // Sienna
+    'rgba(222, 184, 135, 0.9)', // Wheat
+    'rgba(210, 105, 30, 0.9)',  // Chocolate
+    'rgba(188, 143, 143, 0.9)', // RosyBrown
+    'rgba(205, 133, 63, 0.9)',  // Peru
+    'rgba(218, 165, 32, 0.9)',  // GoldenRod
+    'rgba(184, 134, 11, 0.9)'   // DarkGoldenRod
+  ];
+
+  const soilPieColors = [
+    '#8B4513', '#A0522D', '#DEB887', '#D2691E',
+    '#BC8F8F', '#CD853F', '#DAA520', '#B8860B'
+  ];
+
+  const cropBarColors = [
+    'rgba(255, 193, 7, 0.9)',   // Amber
+    'rgba(255, 152, 0, 0.9)',   // Orange
+    'rgba(255, 87, 34, 0.9)',   // Deep Orange
+    'rgba(76, 175, 80, 0.9)',   // Green
+    'rgba(139, 195, 74, 0.9)',  // Light Green
+    'rgba(205, 220, 57, 0.9)',  // Lime
+    'rgba(255, 235, 59, 0.9)',  // Yellow
+    'rgba(255, 167, 38, 0.9)'   // Orange Accent
+  ];
+
+  const cropPieColors = [
+    '#FFC107', '#FF9800', '#FF5722', '#4CAF50',
+    '#8BC34A', '#CDDC39', '#FFEB3B', '#FFA726'
+  ];
+
+  // Enhanced chart creation with animations
+  const createChart = (ctx, type, labels, data, colors, borderColors) => {
+    return new Chart(ctx, {
+      type: type,
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderColor: borderColors || colors.map(color => color.replace('0.9', '1')),
+          borderWidth: 3,
+          borderRadius: type === 'bar' ? 12 : 0,
+          borderJoinStyle: 'round',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 2000,
+          easing: 'easeOutQuart'
+        },
+        plugins: {
+          legend: {
+            display: type === 'pie',
+            position: 'bottom',
+            labels: {
+              padding: 25,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              font: {
+                size: 12,
+                weight: '600'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: { size: 13, weight: '600' },
+            bodyFont: { size: 12 },
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true
+          }
+        },
+        scales: type === 'bar' ? {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)',
+              drawBorder: false
+            },
+            ticks: {
+              font: { size: 11, weight: '600' }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { size: 11, weight: '600' },
+              maxRotation: 45
+            }
+          }
+        } : {}
+      }
+    });
+  };
+
+  // Initialize charts
+  document.addEventListener('DOMContentLoaded', function() {
+    // Soil Charts
+    if (soilData.length > 0) {
+      const soilBarCtx = document.getElementById('soilBarChart');
+      const soilPieCtx = document.getElementById('soilPieChart');
+
+      if (soilBarCtx) {
+        createChart(soilBarCtx, 'bar', soilLabels, soilCounts, soilBarColors);
+      }
+      if (soilPieCtx) {
+        createChart(soilPieCtx, 'pie', soilLabels, soilCounts, soilPieColors);
+      }
+    }
+
+    // Crop Charts
+    if (cropData.length > 0) {
+      const cropBarCtx = document.getElementById('cropBarChart');
+      const cropPieCtx = document.getElementById('cropPieChart');
+
+      if (cropBarCtx) {
+        createChart(cropBarCtx, 'bar', cropLabels, cropCounts, cropBarColors);
+      }
+      if (cropPieCtx) {
+        createChart(cropPieCtx, 'pie', cropLabels, cropCounts, cropPieColors);
+      }
+    }
+
+    // Add loading animation
+    setTimeout(() => {
+      document.querySelectorAll('.chart-container').forEach(container => {
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      });
+    }, 500);
+  });
+
+  // Utility functions
+  function downloadChart(canvasId, filename) {
+    const canvas = document.getElementById(canvasId);
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } else {
+      alert('Chart not available for download.');
+    }
+  }
+
+  function generateFullReport() {
+    alert('📊 Generating comprehensive agricultural report...\nThis would include detailed analysis and recommendations.');
+  }
+
+  function shareAnalytics() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Agricultural Analytics Report',
+        text: 'Check out these farming insights from Agri Drain Analytics!',
+        url: window.location.href
+      });
+    } else {
+      alert('🔗 Share this page URL to distribute the analytics insights!');
+    }
+  }
+</script>
+
+<style>
+  .reports-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #f8fffd 0%, #f1f8e9 50%, #e8f5e9 100%);
+    min-height: 100vh;
+  }
+
+  /* Header Styles */
+  .reports-header {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 40px;
+    color: white;
+    box-shadow: 0 20px 40px rgba(27, 94, 32, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reports-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .title-section h1 {
+    font-size: 3em;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    background: linear-gradient(135deg, #ffffff, #e8f5e9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 1.3em;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .stat-icon {
+    font-size: 2.5em;
+    opacity: 0.9;
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 2.2em;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.9em;
+    opacity: 0.8;
+    font-weight: 600;
+  }
+
+  /* Analytics Sections */
+  .analytics-section {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8f5e9;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f1f8e9;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .section-icon {
+    font-size: 2em;
+  }
+
+  .section-title h2 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #1b5e20;
+    font-weight: 700;
+  }
+
+  .section-actions {
+    display: flex;
+    gap: 15px;
+  }
+
+  .btn-download {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+  }
+
+  /* Charts Grid */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 30px;
+  }
+
+  .chart-container {
+    background: linear-gradient(135deg, #f8fffd, #ffffff);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8f5e9;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.6s ease forwards;
+  }
+
+  .chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  .chart-header {
+    margin-bottom: 20px;
+  }
+
+  .chart-header h3 {
+    margin: 0 0 5px 0;
+    color: #2e7d32;
+    font-size: 1.3em;
+    font-weight: 700;
+  }
+
+  .chart-subtitle {
+    color: #666;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+
+  .chart-wrapper {
+    height: 300px;
+    position: relative;
+  }
+
+  .chart-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f1f8e9;
+  }
+
+  .chart-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stat {
+    font-size: 0.9em;
+    color: #555;
+    font-weight: 600;
+  }
+
+  /* No Data Message */
+  .no-data-message {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #f8fffd, #ffffff);
+    border-radius: 16px;
+    border: 2px dashed #c8e6c9;
+  }
+
+  .no-data-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+
+  .no-data-message h3 {
+    color: #2e7d32;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+  }
+
+  .no-data-message p {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 1.1em;
+    line-height: 1.6;
+  }
+
+  /* Action Section */
+  .action-section {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary, .btn-secondary, .btn-tertiary {
+    padding: 14px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #388e3c, #2e7d32);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+  }
+
+  .btn-tertiary {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+  }
+
+  .btn-primary:hover, .btn-secondary:hover, .btn-tertiary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-icon {
+    font-size: 1.1em;
+  }
+
+  /* Animations */
+  @keyframes slideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chart-container:nth-child(1) { animation-delay: 0.1s; }
+  .chart-container:nth-child(2) { animation-delay: 0.2s; }
+  .chart-container:nth-child(3) { animation-delay: 0.3s; }
+  .chart-container:nth-child(4) { animation-delay: 0.4s; }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .reports-container {
+      padding: 15px;
+    }
+
+    .reports-header {
+      padding: 30px 20px;
+    }
+
+    .title-section h1 {
+      font-size: 2.2em;
+    }
+
+    .stats-overview {
+      grid-template-columns: 1fr;
+    }
+
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+      min-width: auto;
+    }
+
+    .section-header {
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn-primary, .btn-secondary, .btn-tertiary {
+      width: 100%;
+      max-width: 300px;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .title-section h1 {
+      font-size: 1.8em;
+    }
+
+    .analytics-section {
+      padding: 20px;
+    }
+
+    .chart-wrapper {
+      height: 250px;
+    }
+  }
+</style>
+{% endblock %}

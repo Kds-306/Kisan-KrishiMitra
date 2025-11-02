@@ -1,0 +1,736 @@
+{% extends "base.html" %}
+{% block title %}Contact - Agri Drain{% endblock %}
+{% block content %}
+
+<div class="contact-container">
+  <!-- Header Section -->
+  <div class="contact-header">
+    <div class="header-content">
+      <h1>📬 Get In Touch</h1>
+      <p class="subtitle">We'd love to hear from you! Share your feedback or reach out to our team.</p>
+    </div>
+    <div class="header-graphic">
+      <div class="graphic-circle"></div>
+      <div class="graphic-circle"></div>
+      <div class="graphic-circle"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    {% if role == 'farmer' %}
+      <!-- Farmer Feedback Form -->
+      <div class="form-section">
+        {% if message %}
+        <div class="success-message">
+          <span class="message-icon">✅</span>
+          <div class="message-content">
+            <h4>Thank You!</h4>
+            <p>{{ message }}</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="form-card">
+          <div class="form-header">
+            <h2>💬 Share Your Feedback</h2>
+            <p>Your thoughts help us improve our services for farmers like you</p>
+          </div>
+
+          <form method="POST" class="modern-form">
+            <div class="input-group">
+              <div class="input-icon">👤</div>
+              <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="input-group">
+              <div class="input-icon">📧</div>
+              <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+            </div>
+
+            <div class="input-group full-width">
+              <div class="input-icon">💭</div>
+              <textarea id="feedback" name="feedback" placeholder="Tell us about your experience, suggestions, or any issues you're facing..." rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <span class="btn-text">Send Feedback</span>
+              <span class="btn-icon">🚀</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    {% elif role == 'admin' %}
+      <!-- Admin Feedback View -->
+      <div class="admin-section">
+        <div class="section-header">
+          <h2>📋 Farmers' Feedback</h2>
+          <div class="feedback-stats">
+            <span class="stat-badge">{{ feedbacks|length if feedbacks else 0 }} Feedback Entries</span>
+          </div>
+        </div>
+
+        {% if feedbacks %}
+        <div class="feedback-grid">
+          {% for f in feedbacks %}
+          <div class="feedback-card">
+            <div class="feedback-header">
+              <div class="farmer-avatar">
+                {{ f['name'][0] if f['name'] else 'F' }}
+              </div>
+              <div class="farmer-info">
+                <h4>{{ f['name'] if f['name'] else 'Anonymous Farmer' }}</h4>
+                <span class="feedback-date">Recent</span>
+              </div>
+            </div>
+            <div class="feedback-content">
+              <p>{{ f['feedback'] }}</p>
+            </div>
+            <div class="feedback-actions">
+              <button class="action-btn reply-btn">
+                <span>↩️ Reply</span>
+              </button>
+              <button class="action-btn archive-btn">
+                <span>📁 Archive</span>
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h3>No Feedback Yet</h3>
+          <p>Farmers haven't submitted any feedback yet. Check back later!</p>
+        </div>
+        {% endif %}
+      </div>
+
+    {% else %}
+      <!-- Guest View -->
+      <div class="guest-section">
+        <div class="guest-card">
+          <div class="guest-icon">🔒</div>
+          <h2>Access Required</h2>
+          <p>Please log in to access the contact and feedback features.</p>
+          <div class="guest-actions">
+            <a href="{{ url_for('farmer_login') }}" class="auth-btn primary">
+              👨‍🌾 Farmer Login
+            </a>
+            <a href="{{ url_for('admin_login') }}" class="auth-btn secondary">
+              👨‍💼 Admin Login
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Contact Information Section -->
+    <div class="contact-info-section">
+      <div class="contact-card">
+        <div class="contact-header">
+          <h2>🌍 Contact Information</h2>
+          <p>Reach out to us through any of these channels</p>
+        </div>
+
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="method-icon">📞</div>
+            <div class="method-info">
+              <h4>Phone Numbers</h4>
+              <p>+91 80808 53575</p>
+              <p>+91 95292 62625</p>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="method-icon">📧</div>
+            <div class="method-info">
+              <h4>Email Address</h4>
+              <p>omikadam167@gmail.com</p>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="method-icon">🕒</div>
+            <div class="method-info">
+              <h4>Response Time</h4>
+              <p>Within 24 hours</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="social-section">
+          <h3>Follow Us On Social Media</h3>
+          <div class="social-grid">
+            <a href="https://facebook.com" target="_blank" class="social-link facebook">
+              <span class="social-icon">🌐</span>
+              <span class="social-text">Facebook</span>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="social-link twitter">
+              <span class="social-icon">🐦</span>
+              <span class="social-text">X (Twitter)</span>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="social-link instagram">
+              <span class="social-icon">📸</span>
+              <span class="social-text">Instagram</span>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="social-link youtube">
+              <span class="social-icon">▶️</span>
+              <span class="social-text">YouTube</span>
+            </a>
+            <a href="https://linkedin.com" target="_blank" class="social-link linkedin">
+              <span class="social-icon">💼</span>
+              <span class="social-text">LinkedIn</span>
+            </a>
+            <a href="https://whatsapp.com" target="_blank" class="social-link whatsapp">
+              <span class="social-icon">💬</span>
+              <span class="social-text">WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .contact-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  /* Header Styles */
+  .contact-header {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
+    border-radius: 24px;
+    padding: 50px 40px;
+    margin-bottom: 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(27, 94, 32, 0.3);
+  }
+
+  .header-content h1 {
+    font-size: 3em;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    background: linear-gradient(135deg, #ffffff, #e8f5e9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 1.3em;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 400;
+    max-width: 600px;
+  }
+
+  .header-graphic {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .graphic-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    animation: pulse 2s infinite;
+  }
+
+  .graphic-circle:nth-child(2) { animation-delay: 0.3s; }
+  .graphic-circle:nth-child(3) { animation-delay: 0.6s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.2); }
+  }
+
+  /* Content Layout */
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* Form Styles */
+  .form-section, .admin-section, .guest-section {
+    grid-column: 1;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8f5e9;
+  }
+
+  .form-header h2 {
+    color: #1b5e20;
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+  }
+
+  .form-header p {
+    color: #666;
+    margin: 0 0 30px 0;
+  }
+
+  .modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 15px;
+    font-size: 1.2em;
+    z-index: 2;
+    color: #666;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    width: 100%;
+    padding: 15px 15px 15px 50px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: white;
+    font-family: inherit;
+  }
+
+  .input-group.full-width textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .input-group input:focus,
+  .input-group textarea:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+  }
+
+  /* Success Message */
+  .success-message {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+  }
+
+  .message-icon {
+    font-size: 1.5em;
+  }
+
+  .message-content h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+  }
+
+  .message-content p {
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  /* Admin Feedback Styles */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .section-header h2 {
+    color: #1b5e20;
+    margin: 0;
+    font-size: 1.8em;
+  }
+
+  .stat-badge {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+
+  .feedback-grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  .feedback-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+  }
+
+  .feedback-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  .feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .farmer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+
+  .farmer-info h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+  }
+
+  .feedback-date {
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  .feedback-content p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .feedback-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .reply-btn {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .archive-btn {
+    background: #f5f5f5;
+    color: #666;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #666;
+  }
+
+  .empty-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+
+  .empty-state h3 {
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  /* Guest Section */
+  .guest-card {
+    background: white;
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .guest-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+  }
+
+  .guest-card h2 {
+    color: #1b5e20;
+    margin-bottom: 15px;
+  }
+
+  .guest-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  .auth-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .auth-btn.primary {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+  }
+
+  .auth-btn.secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 2px solid #e0e0e0;
+  }
+
+  .auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Contact Info Section */
+  .contact-info-section {
+    grid-column: 2;
+    position: sticky;
+    top: 20px;
+  }
+
+  .contact-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8f5e9;
+  }
+
+  .contact-header h2 {
+    color: #1b5e20;
+    margin: 0 0 10px 0;
+    font-size: 1.5em;
+  }
+
+  .contact-header p {
+    color: #666;
+    margin: 0 0 25px 0;
+  }
+
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .contact-method {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8fffd;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .contact-method:hover {
+    background: #e8f5e9;
+    transform: translateX(5px);
+  }
+
+  .method-icon {
+    font-size: 1.5em;
+  }
+
+  .method-info h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1em;
+  }
+
+  .method-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  /* Social Media Section */
+  .social-section h3 {
+    color: #1b5e20;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.2em;
+  }
+
+  .social-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
+
+  .social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .social-link.facebook:hover { background: #1877f2; color: white; }
+  .social-link.twitter:hover { background: #1da1f2; color: white; }
+  .social-link.instagram:hover { background: #e4405f; color: white; }
+  .social-link.youtube:hover { background: #ff0000; color: white; }
+  .social-link.linkedin:hover { background: #0a66c2; color: white; }
+  .social-link.whatsapp:hover { background: #25d366; color: white; }
+
+  /* Responsive Design */
+  @media (max-width: 968px) {
+    .content-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-info-section {
+      grid-column: 1;
+      position: static;
+    }
+
+    .contact-header h1 {
+      font-size: 2.5em;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contact-container {
+      padding: 0 15px;
+    }
+
+    .contact-header {
+      padding: 40px 25px;
+    }
+
+    .contact-header h1 {
+      font-size: 2em;
+    }
+
+    .form-card, .contact-card {
+      padding: 30px 25px;
+    }
+
+    .guest-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .auth-btn {
+      width: 100%;
+      max-width: 250px;
+      justify-content: center;
+    }
+
+    .social-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contact-header h1 {
+      font-size: 1.8em;
+    }
+
+    .form-card, .contact-card {
+      padding: 25px 20px;
+    }
+
+    .section-header {
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock %}

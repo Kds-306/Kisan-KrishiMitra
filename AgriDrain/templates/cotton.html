@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Cotton - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="crop-detail">
+  <h2>🌿 Cotton (Gossypium spp.)</h2>
+  <img src="https://t4.ftcdn.net/jpg/06/84/31/79/360_F_684317966_Pn9qU1DEfW5zpwoj25znJ1i0VdaOM2Px.jpg" alt="Cotton Plant">
+
+  <p>Cotton is a vital cash crop in India, integral to both the economy and agriculture. This versatile crop thrives across various agro-ecological zones in India, benefiting from the country’s diverse climate and soil conditions.</p>
+
+  <h3>🔹 Major Cotton Producing States</h3>
+  <ul>
+    <li>Gujarat</li>
+    <li>Maharashtra</li>
+    <li>Telangana</li>
+    <li>Andhra Pradesh</li>
+    <li>Punjab</li>
+    <li>Haryana</li>
+    <li>Madhya Pradesh</li>
+    <li>Rajasthan</li>
+    <li>Karnataka</li>
+    <li>Tamil Nadu</li>
+  </ul>
+
+  <h3>🌱 Growing Conditions</h3>
+  <p><strong>Temperature:</strong> 21°C–30°C | <strong>Rainfall:</strong> 500–1500 mm annually | <strong>Soil:</strong> Well-drained, deep, and fertile soils with a pH range of 6.0 to 7.5</p>
+
+  <h3>💧 Irrigation & Drainage</h3>
+  <p>Cotton requires moderate irrigation, especially during dry spells. Proper drainage is essential to prevent root rot and other water-related diseases.</p>
+
+  <h3>💡 Uses</h3>
+  <p>Cotton is primarily used in the textile industry, but it also has applications in the production of cottonseed oil, animal feed, and as a raw material for various industrial products.</p>
+
+  <a href="{{ url_for('crop') }}" class="back-link">← Back to Crops</a>
+</div>
+
+<style>
+.crop-detail {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #f9fff8;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.crop-detail img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+.crop-detail h2 {
+  color: #2e7d32;
+  text-align: center;
+}
+.crop-detail h3 {
+  margin-top: 20px;
+  color: #1b5e20;
+}
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #2e7d32;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+</style>
+{% endblock %}

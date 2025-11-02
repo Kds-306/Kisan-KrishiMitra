@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}About Us - Agri Drain{% endblock %}
+{% block content %}
+
+<div class="about-container">
+  <div class="section">
+    <img src="https://img.khetivyapar.com/images/blogs/1702368823-tap-water.jpg" alt="Drainage Field">
+    <p>
+      Agricultural water drainage focuses on removing excess water from farmland to maintain an ideal soil moisture balance.
+      This process prevents root rot and waterlogging while allowing crops to receive proper oxygen levels for growth.
+      Through efficient drainage systems, farmers can improve soil aeration, sustain fertility, and protect crops from the harmful effects of stagnant water.
+    </p>
+  </div>
+
+  <div class="section reverse">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgfMZ1Ad7QgB2xyxIXIlxOw46GKctYgLCwtw&s" alt="Soil Moisture Management">
+    <p>
+      Proper management of water resources plays a vital role in improving crop productivity and minimizing soil-borne diseases.
+      It ensures irrigation efficiency by preventing water wastage and supports long-term soil health.
+      A well-planned drainage network helps farmers optimize resource use and achieve sustainable agricultural outcomes year after year.
+    </p>
+  </div>
+
+  <div class="section">
+    <img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41893-019-0393-0/MediaObjects/41893_2019_393_Fig1_HTML.png" alt="Efficient Irrigation System">
+    <p>
+      Administrators recommend that farmers regularly monitor soil moisture levels using sensors or manual observation.
+      The adoption of drip irrigation systems minimizes water loss and ensures accurate watering of crops.
+      Developing small drainage channels and improving soil with organic matter enhances permeability and boosts water infiltration capacity, ensuring a balanced ecosystem.
+    </p>
+  </div>
+
+  <div class="section reverse">
+    <img src="{{ url_for('static', filename='images/Gemini.png') }}" alt="Water Reuse and Rainwater Harvesting">
+    <p>
+      Efficient water usage means utilizing every drop wisely.
+      Reusing naturally filtered drainage water for secondary irrigation, implementing rainwater harvesting, and rotating crops to balance water needs all contribute to 100% utilization.
+      When irrigation is scheduled according to soil type, crop variety, and climate, it promotes both productivity and sustainable farming practices.
+    </p>
+  </div>
+</div>
+
+<style>
+  .about-container {
+    max-width: 1100px;
+    margin: 60px auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 45px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+
+  .section {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .section.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .section img {
+    width: 45%;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .section img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  }
+
+  .section p {
+    flex: 1;
+    text-align: justify;
+    font-size: 1.1em;
+    line-height: 1.7;
+    color: #2e2e2e;
+  }
+
+  @media (max-width: 800px) {
+    .section {
+      flex-direction: column;
+    }
+    .section.reverse {
+      flex-direction: column;
+    }
+    .section img {
+      width: 100%;
+    }
+  }
+</style>
+
+{% endblock %}

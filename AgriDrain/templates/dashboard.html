@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <h2>🌾 Farmer Submissions</h2>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% if farmers %}
+  <div class="table-container">
+    <table class="dashboard-table">
+      <thead>
+        <tr>
+          <th>Submission ID</th>
+          <th>Farmer ID</th>
+          <th>Name</th>
+          <th>Soil Type</th>
+          <th>Water Level</th>
+          <th>Crop</th>
+          <th>Farm Location</th>
+          <th>Coordinates</th>
+          <th>Submitted Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in farmers %}
+        <tr>
+          <td class="id-cell">
+            <strong>#{{ f['id'] }}</strong>
+          </td>
+          <td class="id-cell">
+            {% if f.get('farmer_registration_id') %}
+              <span class="farmer-id">👨‍🌾 {{ f['farmer_registration_id'] }}</span>
+            {% else %}
+              <span class="no-data">N/A</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ f['name'] }}</strong></td>
+          <td>
+            <span class="soil-badge">{{ f['soil_type'] }}</span>
+          </td>
+          <td>
+            {% if 'Low' in f['water_level'] %}
+              <span class="water-badge low">💧 {{ f['water_level'] }}</span>
+            {% elif 'Moderate' in f['water_level'] %}
+              <span class="water-badge moderate">💧 {{ f['water_level'] }}</span>
+            {% elif 'High' in f['water_level'] %}
+              <span class="water-badge high">💧 {{ f['water_level'] }}</span>
+            {% elif 'Waterlogged' in f['water_level'] %}
+              <span class="water-badge waterlogged">💧 {{ f['water_level'] }}</span>
+            {% else %}
+              <span class="water-badge">💧 {{ f['water_level'] }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="crop-badge">🌾 {{ f['crop'] }}</span>
+          </td>
+          <td class="location-cell">
+            {% if f['farm_address'] %}
+              <div class="location-info">
+                <span class="address">{{ f['farm_address'] }}</span>
+                {% if f['latitude'] and f['longitude'] %}
+                <button class="view-map-btn" onclick="viewOnMap({{ f['latitude'] }}, {{ f['longitude'] }}, '{{ f['name'] }}')">
+                  🗺️ View Map
+                </button>
+                {% endif %}
+              </div>
+            {% else %}
+              <span class="no-data">Not provided</span>
+            {% endif %}
+          </td>
+          <td class="coordinates">
+            {% if f['latitude'] and f['longitude'] %}
+              <code>{{ "%.6f"|format(f['latitude']) }}, {{ "%.6f"|format(f['longitude']) }}</code>
+              <button class="copy-btn" onclick="copyCoordinates({{ f['latitude'] }}, {{ f['longitude'] }})">
+                📋 Copy
+              </button>
+            {% else %}
+              <span class="no-data">Not available</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if f['formatted_date'] %}
+              <span class="date-badge">
+                {{ f['formatted_date'] }}<br>
+                <small>{{ f['formatted_time'] }}</small>
+              </span>
+            {% else %}
+              <span class="no-data">N/A</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view" onclick="viewFarmerDetails({{ f['id'] }})">👁️ View</button>
+              <a href="{{ url_for('delete_submission', submission_id=f['id']) }}"
+                 class="btn-delete"
+                 onclick="return confirm('Are you sure you want to delete submission #{{ f['id'] }}?')">
+                🗑️ Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <h3>📊 Total Submissions</h3>
+      <p class="count">{{ farmers|length }}</p>
+    </div>
+    <div class="summary-card">
+      <h3>👨‍🌾 Unique Farmers</h3>
+      <p class="count">
+        {% set unique_farmers = [] %}
+        {% for f in farmers %}
+          {% if f.get('farmer_registration_id') and f['farmer_registration_id'] not in unique_farmers %}
+            {% set _ = unique_farmers.append(f['farmer_registration_id']) %}
+          {% endif %}
+        {% endfor %}
+        {{ unique_farmers|length }}
+      </p>
+    </div>
+    <div class="summary-card">
+      <h3>🌱 Most Common Soil</h3>
+      <p class="common">
+        {% set soils = {} %}
+        {% for f in farmers %}
+          {% set soil = f['soil_type'] %}
+          {% if soil in soils %}
+            {% set _ = soils.update({soil: soils[soil] + 1}) %}
+          {% else %}
+            {% set _ = soils.update({soil: 1}) %}
+          {% endif %}
+        {% endfor %}
+        {% set most_common_soil = soils | dictsort(by='value') | last %}
+        {{ most_common_soil[0] if most_common_soil else 'N/A' }}
+      </p>
+    </div>
+  </div>
+
+  {% else %}
+    <div class="no-data-container">
+      <div class="no-data-icon">📝</div>
+      <h3>No Farmer Data Yet</h3>
+      <p>No farmers have submitted their data yet. Check back later.</p>
+    </div>
+  {% endif %}
+
+  <div class="dashboard-actions">
+    <a href="{{ url_for('farmer_data') }}" class="btn-green">👨‍🌾 View Registered Farmers</a>
+    <a href="{{ url_for('home') }}" class="btn-back">← Back to Home</a>
+    <a href="{{ url_for('reset_ids') }}" class="btn-reset" onclick="return confirm('Are you sure you want to reset all IDs to start from 1? This will affect new registrations and submissions.')">
+        🔄 Reset IDs
+    </a>
+    <button onclick="exportToCSV()" class="btn-export">📊 Export to CSV</button>
+</div>
+
+<!-- Map Modal -->
+<div id="mapModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeMapModal()">&times;</span>
+    <h3>📍 Farm Location</h3>
+    <div id="modalMap"></div>
+    <div class="map-details">
+      <p><strong>Farmer:</strong> <span id="farmerName"></span></p>
+      <p><strong>Coordinates:</strong> <span id="mapCoordinates"></span></p>
+    </div>
+  </div>
+</div>
+
+<style>
+.dashboard-container {
+  max-width: 1600px;
+  margin: 30px auto;
+  background: rgba(255,255,255,0.95);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+/* Flash Messages */
+.flash-messages {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.flash-message {
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.flash-message.success {
+  background: #4caf50;
+}
+
+.flash-message.error {
+  background: #f44336;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+h2 {
+  text-align: center;
+  color: #2e7d32;
+  margin-bottom: 30px;
+  font-size: 2.2em;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 25px 0;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  font-size: 0.9em;
+}
+
+.dashboard-table th {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: white;
+  padding: 15px 8px;
+  text-align: left;
+  font-weight: 600;
+  border: none;
+  white-space: nowrap;
+}
+
+.dashboard-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.dashboard-table tr:hover {
+  background-color: #f8fffa;
+}
+
+.dashboard-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.dashboard-table tr:nth-child(even):hover {
+  background-color: #f0f8f0;
+}
+
+/* ID Cell Styles */
+.id-cell {
+  text-align: center;
+  font-weight: bold;
+}
+
+.farmer-id {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  border: 1px solid #bbdefb;
+}
+
+/* Badge Styles */
+.soil-badge {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: 500;
+  border: 1px solid #c8e6c9;
+  white-space: nowrap;
+}
+
+.water-badge {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.water-badge.low { background: #fff3e0; color: #ef6c00; border-color: #ffb74d; }
+.water-badge.moderate { background: #e3f2fd; color: #1976d2; border-color: #64b5f6; }
+.water-badge.high { background: #e8f5e9; color: #2e7d32; border-color: #81c784; }
+.water-badge.waterlogged { background: #e0f2f1; color: #00695c; border-color: #4db6ac; }
+
+.crop-badge {
+  background: #fff8e1;
+  color: #ff8f00;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: 500;
+  border: 1px solid #ffd54f;
+  white-space: nowrap;
+}
+
+.date-badge {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.75em;
+  text-align: center;
+  display: block;
+  white-space: nowrap;
+}
+
+/* Location Cell */
+.location-cell {
+  max-width: 200px;
+  min-width: 150px;
+}
+
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.address {
+  font-size: 0.75em;
+  color: #555;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.view-map-btn {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7em;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.view-map-btn:hover {
+  background: #1976d2;
+}
+
+/* Coordinates */
+.coordinates {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7em;
+  min-width: 120px;
+}
+
+.copy-btn {
+  background: #757575;
+  color: white;
+  border: none;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.65em;
+  cursor: pointer;
+  margin-top: 3px;
+}
+
+.copy-btn:hover {
+  background: #616161;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-view, .btn-delete {
+  border: none;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.7em;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-view {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #388e3c;
+}
+
+.btn-delete {
+  background: #f44336;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #d32f2f;
+  text-decoration: none;
+  color: white;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.summary-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.summary-card h3 {
+  color: #666;
+  font-size: 0.8em;
+  margin-bottom: 8px;
+}
+
+.summary-card .count {
+  font-size: 2em;
+  font-weight: bold;
+  color: #2e7d32;
+  margin: 0;
+}
+
+.summary-card .common {
+  font-size: 1em;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* No Data Styling */
+.no-data-container {
+  text-align: center;
+  padding: 50px 20px;
+  background: #fafafa;
+  border-radius: 15px;
+  border: 2px dashed #ddd;
+}
+
+.no-data-icon {
+  font-size: 3em;
+  margin-bottom: 15px;
+}
+
+.no-data-container h3 {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.no-data-container p {
+  color: #888;
+  margin: 0;
+}
+
+.no-data {
+  color: #999;
+  font-style: italic;
+  font-size: 0.8em;
+}
+
+/* Dashboard Actions */
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.btn-green, .btn-back, .btn-export {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.btn-green {
+  background: #2e7d32;
+  color: white;
+}
+
+.btn-green:hover {
+  background: #1b5e20;
+  transform: translateY(-2px);
+}
+
+.btn-back {
+  background: #757575;
+  color: white;
+}
+
+.btn-back:hover {
+  background: #616161;
+  transform: translateY(-2px);
+}
+
+.btn-export {
+  background: #ff9800;
+  color: white;
+}
+
+.btn-export:hover {
+  background: #f57c00;
+  transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 700px;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+
+.close:hover {
+  color: #333;
+}
+
+#modalMap {
+  height: 350px;
+  width: 100%;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.map-details {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin: 15px;
+    padding: 20px;
+  }
+
+  .dashboard-table {
+    font-size: 0.7em;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    padding: 6px 4px;
+  }
+}
+    .btn-reset {
+    background: linear-gradient(90deg, #ff9800, #ff5722);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.btn-reset:hover {
+    background: linear-gradient(90deg, #f57c00, #e64a19);
+    transform: translateY(-2px);
+}
+</style>
+
+<!-- Leaflet for Map Modal -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+let modalMap;
+
+function viewOnMap(lat, lng, farmerName) {
+  document.getElementById('farmerName').textContent = farmerName;
+  document.getElementById('mapCoordinates').textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+
+  const modal = document.getElementById('mapModal');
+  modal.style.display = 'block';
+
+  // Initialize or update map
+  if (!modalMap) {
+    modalMap = L.map('modalMap').setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(modalMap);
+  } else {
+    modalMap.setView([lat, lng], 13);
+  }
+
+  // Clear existing markers and add new one
+  modalMap.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      modalMap.removeLayer(layer);
+    }
+  });
+
+  L.marker([lat, lng])
+    .addTo(modalMap)
+    .bindPopup(`<b>${farmerName}</b><br>Farm Location`)
+    .openPopup();
+}
+
+function closeMapModal() {
+  document.getElementById('mapModal').style.display = 'none';
+}
+
+function copyCoordinates(lat, lng) {
+  const text = lat + ', ' + lng;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Coordinates copied to clipboard!');
+  });
+}
+
+function viewFarmerDetails(farmerId) {
+  alert('View details for submission ID: ' + farmerId);
+  // Implement detailed view functionality
+}
+
+function exportToCSV() {
+  alert('Export to CSV functionality would be implemented here');
+  // Implement CSV export functionality
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('mapModal');
+  if (event.target === modal) {
+    closeMapModal();
+  }
+}
+
+// Auto-hide flash messages after 5 seconds
+setTimeout(function() {
+  const flashMessages = document.querySelectorAll('.flash-message');
+  flashMessages.forEach(function(message) {
+    message.style.display = 'none';
+  });
+}, 5000);
+</script>
+{% endblock %}

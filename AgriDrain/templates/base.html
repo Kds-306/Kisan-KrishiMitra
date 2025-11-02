@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Agri Drain{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header>
+    <h1>🌾Kisan KrishiMitra </h1>
+    <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+
+      {% if not session.get('admin_logged_in') %}
+        <a href="{{ url_for('farmer') }}">Farmer</a>
+      {% endif %}
+
+      {% if session.get('admin_logged_in') %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      {% endif %}
+
+      <!-- Add Suggestion link - Only show when farmer is logged in -->
+      {% if session.get('farmer_logged_in') %}
+        <a href="{{ url_for('suggestion') }}">🌱 Suggestions</a>
+      {% endif %}
+
+      <a href="{{ url_for('about') }}">About Info</a>
+
+      {% if session.get('admin_logged_in') %}
+        <a href="{{ url_for('reports') }}">Reports</a>
+      {% endif %}
+
+      <a href="{{ url_for('irrigation') }}">Irrigation</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('crop') }}">Crop</a>
+
+      <!-- 🔒 Login / Register Dropdown -->
+      <div class="login-dropdown">
+        <button class="login-dropbtn">
+          {% if session.get('farmer_logged_in') or session.get('admin_logged_in') %}
+            👤 Account
+          {% else %}
+            🔑 Login / Register
+          {% endif %}
+        </button>
+
+        <div class="login-dropdown-content">
+          {% if not session.get('farmer_logged_in') and not session.get('admin_logged_in') %}
+            <strong>👨‍🌾 Farmer</strong>
+            <a href="{{ url_for('farmer_login') }}">Login</a>
+            <a href="{{ url_for('farmer_register') }}">Register</a>
+            <hr>
+            <strong>👨‍💼 Admin</strong>
+            <a href="{{ url_for('admin_login') }}">Login</a>
+          {% else %}
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    © 2025 Agri Drain | Empowering Farmers for Smart Water Use
+  </footer>
+</body>
+</html>

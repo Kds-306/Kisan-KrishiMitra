@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+{% block title %}Farmer - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="farmer-page">
+  <h2 class="page-title">👨‍🌾 Farmer Dashboard</h2>
+  <p class="subtitle">
+    Submit your field data and get instant crop suggestions based on your soil and water conditions.
+  </p>
+
+  <form method="POST" class="farmer-form">
+    <label for="name">👤 Username / Name:</label>
+    <input type="text" name="name" id="name" placeholder="Enter your name" required>
+
+    <label for="soil">🌱 Soil Type:</label>
+    <div class="custom-select-container">
+      <select name="soil" id="soil" required onchange="suggestCrops()">
+        <option value="">-- Select Soil Type --</option>
+        <option>Black Soil</option>
+        <option>Laterite Soil</option>
+        <option>Alluvial Soil</option>
+        <option>Red Soil</option>
+        <option>Marshy and Peaty Soil</option>
+      </select>
+    </div>
+
+    <label for="water">💧 Water Level:</label>
+    <select name="water" id="water" required onchange="suggestCrops()">
+      <option value="">-- Select Water Level --</option>
+      <option>Low (Below 2m)</option>
+      <option>Moderate (2m - 5m)</option>
+      <option>High (Above 5m)</option>
+      <option>Waterlogged Area</option>
+    </select>
+
+    <!-- Auto-suggested crops will appear here -->
+    <div id="crop-suggestions" class="crop-suggestions" style="display: none;">
+      <label>🌾 Suggested Crops:</label>
+      <div class="suggested-crops-list" id="suggested-crops-list"></div>
+    </div>
+
+    <label for="crop">🌾 Select Your Crop:</label>
+    <select name="crop" id="crop" required>
+      <option value="">-- Select Crop --</option>
+
+      <optgroup label="🟢 Kharif Crops (Monsoon Season - June to Oct)">
+        <option>Jowar (Sorghum)</option>
+        <option>Bajra (Pearl Millet)</option>
+        <option>Rice</option>
+        <option>Tur (Pigeon Pea)</option>
+        <option>Moong (Green Gram)</option>
+        <option>Urad (Black Gram)</option>
+        <option>Soybean</option>
+        <option>Groundnut</option>
+        <option>Cotton</option>
+        <option>Sugarcane</option>
+        <option>Turmeric</option>
+        <option>Onion (Early Kharif)</option>
+      </optgroup>
+
+      <optgroup label="🟡 Rabi Crops (Winter Season - Nov to Mar)">
+        <option>Wheat</option>
+        <option>Gram (Chana)</option>
+        <option>Jowar (Rabi)</option>
+        <option>Sunflower</option>
+        <option>Safflower</option>
+        <option>Onion (Rabi)</option>
+        <option>Tomato</option>
+        <option>Potato</option>
+        <option>Grapes</option>
+        <option>Barley</option>
+        <option>Mustard</option>
+        <option>Coriander</option>
+      </optgroup>
+
+      <optgroup label="🔵 Zaid/Summer Crops (Mar to Jun)">
+        <option>Watermelon</option>
+        <option>Muskmelon</option>
+        <option>Cucumber</option>
+        <option>Bitter Gourd</option>
+        <option>Pumpkin</option>
+        <option>Sunflower (Summer)</option>
+      </optgroup>
+
+      <optgroup label="🌴 Perennial Crops">
+        <option>Mango</option>
+        <option>Banana</option>
+        <option>Orange (Nagpur)</option>
+        <option>Pomegranate</option>
+        <option>Cashew</option>
+        <option>Coconut</option>
+        <option>Sapota (Chikoo)</option>
+        <option>Guava</option>
+      </optgroup>
+    </select>
+
+    <!-- Farm Location Section -->
+    <div class="location-section">
+      <label for="farm-location">📍 Farm Location:</label>
+      <div class="location-input-group">
+        <input type="text" id="farm-address" name="farm_address" placeholder="Enter your farm address" readonly>
+        <button type="button" class="location-btn" onclick="getLocation()">📌 Get Current Location</button>
+      </div>
+      <div id="map-container">
+        <div id="map"></div>
+        <div class="map-instructions">
+          <p>📍 Click on the map to mark your farm location</p>
+        </div>
+      </div>
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
+    </div>
+
+    <button type="submit">🚜 Submit Data</button>
+  </form>
+
+  {% if message %}
+<div style="text-align:center; margin-top:20px;">
+  <button class="popup-btn view-btn" onclick="showPopup('messagePopup')">
+    💬 View Submission Message
+  </button>
+
+  <!-- Add this new button to view crop suggestions -->
+  <button class="popup-btn suggestion-btn" onclick="window.location.href='/suggestion'">
+    🌱 View Crop Suggestions
+  </button>
+</div>
+
+<div id="messagePopup" class="popup">
+  <div class="popup-content">
+    <span class="close" onclick="hidePopup('messagePopup')">&times;</span>
+    <h3>✅ Submission Status</h3>
+    <p>{{ message }}</p>
+  </div>
+</div>
+{% endif %}
+</div>
+
+<style>
+  /* 🌾 Page Wrapper */
+  .farmer-page {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #f7fff7;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    font-family: "Poppins", sans-serif;
+  }
+  .page-title {
+    text-align: center;
+    color: #2e7d32;
+    font-size: 1.9em;
+  }
+  .subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+  }
+  .farmer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .farmer-form input,
+  .farmer-form select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    transition: 0.3s;
+  }
+  .farmer-form button {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  /* Crop Suggestions */
+  .crop-suggestions {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #c8e6c9;
+    margin: 10px 0;
+  }
+
+  .suggested-crops-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .crop-badge {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .crop-badge:hover {
+    background: linear-gradient(135deg, #388e3c, #1b5e20);
+    transform: translateY(-2px);
+  }
+
+  /* Location Section Styles */
+  .location-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f1f8e9;
+    border-radius: 15px;
+    border: 2px dashed #c8e6c9;
+  }
+
+  .location-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .location-input-group input {
+    flex: 1;
+    background: white;
+  }
+
+  .location-btn {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+
+  .location-btn:hover {
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+  }
+
+  .location-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  #map-container {
+    margin-top: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #map {
+    height: 300px;
+    width: 100%;
+    background: #e8f5e9;
+  }
+
+  .map-instructions {
+    background: #2e7d32;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+
+  .map-instructions p {
+    margin: 0;
+  }
+
+  .location-error {
+    color: #d32f2f;
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  .popup-content {
+    background: #f9fff9;
+    margin: 12% auto;
+    padding: 25px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: popupFade 0.3s ease;
+    text-align: left;
+  }
+  .popup-content h3 {
+    color: #2e7d32;
+    text-align: center;
+  }
+  .popup-content p {
+    text-align: left;
+    font-weight: 500;
+    margin: 5px 0;
+  }
+  .close {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+  }
+  .popup-btn {
+    margin-top: 15px;
+    background: #43a047;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .popup-btn:hover {
+    background: #2e7d32;
+  }
+  @keyframes popupFade {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .view-btn {
+    font-size: 1.2em;
+    padding: 15px 35px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .view-btn:hover {
+    background: linear-gradient(135deg, #66bb6a, #388e3c);
+  }
+
+  /* Custom dropdown styles remain the same */
+  .custom-select-container {
+    position: relative;
+    font-family: "Poppins", sans-serif;
+  }
+  .custom-select-container select {
+    display: none;
+  }
+  .select-selected {
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .select-selected.select-arrow-active:after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  .select-selected:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #555;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.3s;
+  }
+  .select-items {
+    position: absolute;
+    background-color: #fff;
+    top: 110%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .select-hide {
+    display: none;
+  }
+  .select-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+  }
+  .select-item:last-child {
+      border-bottom: none;
+  }
+  .select-item:hover {
+    background-color: #f1f8e9;
+  }
+  .select-item img, .select-selected img {
+      width: 30px;
+      height: 30px;
+      margin-right: 15px;
+      border-radius: 5px;
+      object-fit: cover;
+  }
+  .suggestion-btn {
+  font-size: 1.2em;
+  padding: 15px 35px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-left: 15px;
+}
+
+.suggestion-btn:hover {
+  background: linear-gradient(135deg, #ffb74d, #ff9800);
+}
+
+  /* Style for crop season groups */
+  optgroup {
+    font-weight: bold;
+    font-size: 1em;
+  }
+  optgroup[label*="Kharif"] { color: #2e7d32; }
+  optgroup[label*="Rabi"] { color: #ff9800; }
+  optgroup[label*="Zaid"] { color: #2196f3; }
+  optgroup[label*="Perennial"] { color: #9c27b0; }
+</style>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  let map;
+  let marker;
+  let currentLat = 19.7515; // Maharashtra center
+  let currentLng = 75.7139;
+
+  // Crop suggestions database
+  const cropSuggestions = {
+    // Black Soil (Regur) - Great for cotton, cereals
+    "Black Soil": {
+      "Low (Below 2m)": ["Cotton", "Groundnut", "Jowar (Sorghum)", "Soybean"],
+      "Moderate (2m - 5m)": ["Cotton", "Soybean", "Jowar (Sorghum)", "Wheat", "Sunflower"],
+      "High (Above 5m)": ["Sugarcane", "Rice", "Turmeric", "Banana"],
+      "Waterlogged Area": ["Rice", "Sugarcane"]
+    },
+    // Laterite Soil - Good for plantation crops
+    "Laterite Soil": {
+      "Low (Below 2m)": ["Cashew", "Groundnut", "Bajra (Pearl Millet)"],
+      "Moderate (2m - 5m)": ["Cashew", "Sugarcane", "Turmeric", "Mango"],
+      "High (Above 5m)": ["Rice", "Sugarcane", "Banana"],
+      "Waterlogged Area": ["Rice"]
+    },
+    // Alluvial Soil - Very fertile, good for most crops
+    "Alluvial Soil": {
+      "Low (Below 2m)": ["Wheat", "Gram (Chana)", "Barley", "Mustard"],
+      "Moderate (2m - 5m)": ["Wheat", "Rice", "Sugarcane", "Cotton", "Maize"],
+      "High (Above 5m)": ["Rice", "Sugarcane", "Banana", "Turmeric"],
+      "Waterlogged Area": ["Rice", "Jute"]
+    },
+    // Red Soil - Good for millets, pulses
+    "Red Soil": {
+      "Low (Below 2m)": ["Groundnut", "Bajra (Pearl Millet)", "Ragi", "Gram (Chana)"],
+      "Moderate (2m - 5m)": ["Groundnut", "Jowar (Sorghum)", "Cotton", "Maize"],
+      "High (Above 5m)": ["Rice", "Sugarcane"],
+      "Waterlogged Area": ["Rice"]
+    },
+    // Marshy and Peaty Soil - Good for rice, aquaculture
+    "Marshy and Peaty Soil": {
+      "Low (Below 2m)": ["Rice", "Jute", "Sugarcane"],
+      "Moderate (2m - 5m)": ["Rice", "Sugarcane", "Banana"],
+      "High (Above 5m)": ["Rice", "Sugarcane", "Aquaculture"],
+      "Waterlogged Area": ["Rice", "Aquaculture", "Jute"]
+    }
+  };
+
+  // Function to suggest crops based on soil and water
+  function suggestCrops() {
+    const soil = document.getElementById('soil').value;
+    const water = document.getElementById('water').value;
+    const suggestionsDiv = document.getElementById('crop-suggestions');
+    const cropsList = document.getElementById('suggested-crops-list');
+
+    if (soil && water && cropSuggestions[soil] && cropSuggestions[soil][water]) {
+      const suggestedCrops = cropSuggestions[soil][water];
+
+      cropsList.innerHTML = '';
+      suggestedCrops.forEach(crop => {
+        const badge = document.createElement('div');
+        badge.className = 'crop-badge';
+        badge.textContent = crop;
+        badge.onclick = function() {
+          document.getElementById('crop').value = crop;
+        };
+        cropsList.appendChild(badge);
+      });
+
+      suggestionsDiv.style.display = 'block';
+    } else {
+      suggestionsDiv.style.display = 'none';
+    }
+  }
+
+  // Initialize map
+  function initMap() {
+    map = L.map('map').setView([currentLat, currentLng], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add click event to map
+    map.on('click', function(e) {
+      const { lat, lng } = e.latlng;
+      updateMarker(lat, lng);
+      reverseGeocode(lat, lng);
+    });
+
+    // Add initial marker
+    marker = L.marker([currentLat, currentLng]).addTo(map)
+      .bindPopup('Your farm location')
+      .openPopup();
+  }
+
+  // Update marker position
+  function updateMarker(lat, lng) {
+    if (marker) {
+      map.removeLayer(marker);
+    }
+    marker = L.marker([lat, lng]).addTo(map)
+      .bindPopup('Your farm location')
+      .openPopup();
+
+    document.getElementById('latitude').value = lat;
+    document.getElementById('longitude').value = lng;
+    currentLat = lat;
+    currentLng = lng;
+  }
+
+  // Get current location using GPS
+  function getLocation() {
+    const locationBtn = document.querySelector('.location-btn');
+    const originalText = locationBtn.textContent;
+
+    locationBtn.textContent = '📍 Getting Location...';
+    locationBtn.disabled = true;
+
+    if (!navigator.geolocation) {
+      showLocationError('Geolocation is not supported by this browser.');
+      locationBtn.textContent = originalText;
+      locationBtn.disabled = false;
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        updateMarker(lat, lng);
+        map.setView([lat, lng], 15);
+        reverseGeocode(lat, lng);
+
+        locationBtn.textContent = originalText;
+        locationBtn.disabled = false;
+      },
+      function(error) {
+        let errorMessage = 'Unable to retrieve your location.';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please allow location access.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out.';
+            break;
+        }
+        showLocationError(errorMessage);
+        locationBtn.textContent = originalText;
+        locationBtn.disabled = false;
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  }
+
+  // Reverse geocoding to get address
+  function reverseGeocode(lat, lng) {
+    const addressInput = document.getElementById('farm-address');
+    addressInput.value = 'Getting address...';
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.display_name) {
+          addressInput.value = data.display_name;
+        } else {
+          addressInput.value = `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+      })
+      .catch(error => {
+        console.error('Geocoding error:', error);
+        addressInput.value = `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      });
+  }
+
+  // Show location error
+  function showLocationError(message) {
+    let errorDiv = document.querySelector('.location-error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'location-error';
+      document.querySelector('.location-input-group').after(errorDiv);
+    }
+    errorDiv.textContent = message;
+
+    setTimeout(() => {
+      errorDiv.remove();
+    }, 5000);
+  }
+
+  // Popup functions
+  function showPopup(id) {
+    document.getElementById(id).style.display = "block";
+  }
+
+  function hidePopup(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  // Initialize map when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+
+    // Your existing custom dropdown code here...
+    const soilImages = {
+      "Black Soil": "https://indorenursery.com/wp-content/uploads/2023/08/black-soil-1.webp",
+      "Laterite Soil": "https://5.imimg.com/data5/OR/HC/MY-37907573/laterite.jpg",
+      "Alluvial Soil": "https://www.shutterstock.com/image-photo/saline-alluvial-soil-summertime-dry-600nw-2500781017.jpg",
+      "Red Soil": "https://5.imimg.com/data5/ANDROID/Default/2023/9/344476666/MX/OD/KK/21503568/product-jpeg.jpg",
+      "Marshy and Peaty Soil": "https://placehold.co/40x40/5C4033/FFFFFF?text=M",
+    };
+
+    const container = document.querySelector(".custom-select-container");
+    if (!container) return;
+
+    const originalSelect = container.querySelector("select");
+    const options = originalSelect.getElementsByTagName("option");
+
+    const selectedDiv = document.createElement("DIV");
+    selectedDiv.setAttribute("class", "select-selected");
+    selectedDiv.innerHTML = `<span>${options[originalSelect.selectedIndex].innerHTML}</span>`;
+    container.appendChild(selectedDiv);
+
+    const optionsList = document.createElement("DIV");
+    optionsList.setAttribute("class", "select-items select-hide");
+
+    for (let i = 1; i < options.length; i++) {
+      const option = options[i];
+      const itemDiv = document.createElement("DIV");
+      itemDiv.setAttribute("class", "select-item");
+      const imageUrl = soilImages[option.innerHTML] || "https://placehold.co/40x40/cccccc/FFFFFF?text=?";
+
+      itemDiv.innerHTML = `<img src="${imageUrl}" alt="${option.innerHTML}"><span>${option.innerHTML}</span>`;
+
+      itemDiv.addEventListener("click", function() {
+        originalSelect.selectedIndex = i;
+        selectedDiv.innerHTML = this.innerHTML;
+        closeAllSelect();
+        suggestCrops(); // Update crop suggestions when soil changes
+      });
+      optionsList.appendChild(itemDiv);
+    }
+    container.appendChild(optionsList);
+
+    selectedDiv.addEventListener("click", function(e) {
+      e.stopPropagation();
+      closeAllSelect(this);
+      this.nextSibling.classList.toggle("select-hide");
+      this.classList.toggle("select-arrow-active");
+    });
+
+    function closeAllSelect(elmnt) {
+      const allSelectItems = document.getElementsByClassName("select-items");
+      const allSelected = document.getElementsByClassName("select-selected");
+      for (let i = 0; i < allSelectItems.length; i++) {
+        if (allSelected[i] != elmnt) {
+          allSelected[i].classList.remove("select-arrow-active");
+          allSelectItems[i].classList.add("select-hide");
+        }
+      }
+    }
+
+    document.addEventListener("click", closeAllSelect);
+  });
+</script>
+{% endblock %}

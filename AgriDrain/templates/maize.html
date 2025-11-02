@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Maize - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="crop-detail">
+  <h2>🌽 Maize (Zea mays)</h2>
+  <img src="https://t4.ftcdn.net/jpg/09/49/13/93/360_F_949139356_3ZFuYjKHBYEaQmhrmxh3S3TQsU3LNtlc.jpg" alt="Maize">
+
+  <p>Maize is a versatile crop grown in both Kharif and Rabi seasons. It thrives in warm climates and moderately fertile soils with proper drainage.</p>
+
+  <h3>🔹 Major Producing States</h3>
+  <ul>
+    <li>Karnataka</li>
+    <li>Madhya Pradesh</li>
+    <li>Rajasthan</li>
+    <li>Uttar Pradesh</li>
+    <li>Andhra Pradesh</li>
+  </ul>
+
+  <h3>🌱 Growing Conditions</h3>
+  <p>Temperature: 21°C–30°C | Rainfall: 25–75 cm | Soil: Loamy to Clay Loam, Well-drained</p>
+
+  <h3>💧 Irrigation & Drainage</h3>
+  <p>Maize prefers well-drained soils and does not tolerate waterlogging. Adequate irrigation during tasseling and silking improves yield.</p>
+
+  <h3>💡 Uses</h3>
+  <p>Used for food (cornmeal, corn flour), fodder, oil production, and biofuel industries.</p>
+
+  <a href="{{ url_for('crop') }}" class="back-link">← Back to Crops</a>
+</div>
+
+<style>
+.crop-detail {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #f9fff8;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.crop-detail img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+.crop-detail h2 {
+  color: #2e7d32;
+  text-align: center;
+}
+.crop-detail h3 {
+  margin-top: 20px;
+  color: #1b5e20;
+}
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #2e7d32;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+</style>
+{% endblock %}

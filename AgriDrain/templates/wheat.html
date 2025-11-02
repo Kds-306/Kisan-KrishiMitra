@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Wheat - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="crop-detail">
+  <h2>🌾 Wheat (Triticum aestivum)</h2>
+  <img src="https://thumbs.dreamstime.com/b/close-up-field-gre…graph-plants-their-ears-grain-focus-370345480.jpg" alt="Wheat">
+
+  <p>Wheat is a major Rabi crop of India and forms the staple diet of millions. It grows well in cool and moderately dry climates with fertile loamy soil.</p>
+
+  <h3>🔹 Major Producing States</h3>
+  <ul>
+    <li>Uttar Pradesh</li>
+    <li>Punjab</li>
+    <li>Haryana</li>
+    <li>Madhya Pradesh</li>
+    <li>Bihar</li>
+  </ul>
+
+  <h3>🌱 Growing Conditions</h3>
+  <p>Temperature: 10°C–25°C | Rainfall: 50–100 cm | Soil: Loamy, Well-drained</p>
+
+  <h3>💧 Irrigation & Drainage</h3>
+  <p>Wheat requires well-drained soils; overwatering should be avoided. Proper irrigation ensures healthy tillering and grain formation.</p>
+
+  <h3>💡 Uses</h3>
+  <p>Used for making flour (atta), bakery products, and animal feed.</p>
+
+  <a href="{{ url_for('crop') }}" class="back-link">← Back to Crops</a>
+</div>
+
+<style>
+.crop-detail {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #f9fff8;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.crop-detail img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+.crop-detail h2 {
+  color: #2e7d32;
+  text-align: center;
+}
+.crop-detail h3 {
+  margin-top: 20px;
+  color: #1b5e20;
+}
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #2e7d32;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+</style>
+{% endblock %}

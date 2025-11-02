@@ -1,0 +1,206 @@
+/* 🌿 General Page Styling */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background-color: #f9fbe7;
+  color: #333;
+}
+
+/* 🌾 Header */
+header {
+  position: relative;
+  text-align: center;
+  background: linear-gradient(90deg, #e8f5e9, #c8e6c9);
+  padding: 20px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+header h1 {
+  color: #2e7d32;
+  font-size: 2.2rem;
+  margin: 0;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+}
+
+/* 🧭 Navigation Bar */
+nav {
+  margin-top: 12px;
+}
+
+nav a {
+  color: #1b5e20;
+  text-decoration: none;
+  margin: 0 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+nav a:hover {
+  color: white;
+  background: #388e3c;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+/* 🔽 Login Dropdown (Top-Right Corner) */
+.login-dropdown {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  display: inline-block;
+}
+
+.login-dropbtn {
+  background-color: #2e7d32;
+  color: white;
+  padding: 10px 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+  font-size: 1rem;
+}
+
+.login-dropbtn:hover {
+  background-color: #1b5e20;
+}
+
+.login-dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #ffffff;
+  min-width: 180px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.25);
+  border-radius: 10px;
+  z-index: 1;
+  animation: dropdownFade 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.login-dropdown-content a {
+  color: #2e7d32;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.login-dropdown-content a:hover {
+  background-color: #e8f5e9;
+}
+
+.login-dropdown:hover .login-dropdown-content {
+  display: block;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🖼️ Image Slider */
+.image-slider {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+}
+
+.image-slider img {
+  position: absolute;
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.image-slider img.active {
+  opacity: 1;
+}
+
+/* 🌊 Vision Box Overlay (Left Side, Transparent) */
+.vision-box {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  transform: translateY(-60%);
+  background: white(46, 125, 50, 0.75);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  text-align: left;
+  max-width: 320px;
+  line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: fadeInVision 2s ease-in-out;
+  border-left: 5px solid #a5d6a7;
+  backdrop-filter: blur(6px);
+}
+
+.vision-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #c8e6c9;
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+@keyframes fadeInVision {
+  from { opacity: 0; transform: translateY(-40%) translateX(-30px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.vision-box p {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+/* 💬 Welcome Section */
+.welcome-section {
+  text-align: center;
+  background-color: #f1f8e9;
+  padding: 50px 60px;
+  margin: 30px auto;
+  border-radius: 12px;
+  width: 80%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.welcome-section h2 {
+  color: #2e7d32;
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.welcome-section p {
+  font-size: 1.1rem;
+  color: #444;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* 🌱 Footer */
+footer {
+  background: linear-gradient(90deg, #c8e6c9, #a5d6a7);
+  text-align: center;
+  padding: 15px;
+  margin-top: 50px;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+}

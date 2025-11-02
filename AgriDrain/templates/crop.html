@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Major Crops of India - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="crop-container">
+  <h2>🌾 Major Crops of Maharastra</h2>
+  <p class="intro">
+    India's agricultural diversity supports a wide range of crops, each adapted to unique climates, soils, and rainfall patterns.
+    Crops are broadly classified as <strong>Food Crops</strong>, <strong>Cash Crops</strong>, and <strong>Horticultural Crops</strong>.
+  </p>
+
+  <!-- 🥖 Food Crops -->
+  <section class="crop-section">
+    <h3>🍚 Food Crops</h3>
+    <div class="crop-grid">
+      <a href="{{ url_for('rice') }}" class="crop-card">
+        <img src="https://t4.ftcdn.net/jpg/04/73/73/37/360_F_473733756_rS9ps9Ko6RcIj2j7G5FVLei4NdL9717r.jpg" alt="Rice">
+        <h4>Rice</h4>
+        <p>Cultivated in high rainfall areas with fertile alluvial soil. Major states: <strong>West Bengal, Tamil Nadu, Punjab</strong>.</p>
+      </a>
+
+      <a href="{{ url_for('wheat') }}" class="crop-card">
+        <img src="https://thumbs.dreamstime.com/b/close-up-field-gre…graph-plants-their-ears-grain-focus-370345480.jpg" alt="Wheat">
+        <h4>Wheat</h4>
+        <p>Requires moderate climate. Grown mainly in <strong>Uttar Pradesh, Punjab, Haryana, and Madhya Pradesh</strong>.</p>
+      </a>
+
+      <a href="{{ url_for('maize') }}" class="crop-card">
+        <img src="https://t4.ftcdn.net/jpg/09/49/13/93/360_F_949139356_3ZFuYjKHBYEaQmhrmxh3S3TQsU3LNtlc.jpg" alt="Maize">
+        <h4>Maize</h4>
+        <p>Grows well in well-drained soils. Leading states: <strong>Karnataka, Bihar, Madhya Pradesh</strong>.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- 💰 Cash Crops -->
+  <section class="crop-section">
+    <h3>💰 Cash Crops</h3>
+    <div class="crop-grid">
+      <a href="{{ url_for('sugarcane') }}" class="crop-card">
+        <img src="https://t3.ftcdn.net/jpg/05/38/51/14/360_F_538511475_ECZN8hVzzRjOgsZdVWHiwXpkY2wLJB1a.jpg" alt="Sugarcane">
+        <h4>Sugarcane</h4>
+        <p>Needs hot and humid climate. Key producers: <strong>Uttar Pradesh, Maharashtra, Karnataka</strong>.</p>
+      </a>
+
+      <a href="{{ url_for('cotton') }}" class="crop-card">
+        <img src="https://t4.ftcdn.net/jpg/06/84/31/79/360_F_684317966_Pn9qU1DEfW5zpwoj25znJ1i0VdaOM2Px.jpg" alt="Cotton">
+        <h4>Cotton</h4>
+        <p>Thrives in black soil regions. Major states: <strong>Gujarat, Maharashtra, Telangana</strong>.</p>
+      </a>
+
+      <div class="crop-card">
+        <img src="https://plantura.garden/uk/wp-content/uploads/sites/2/2021/10/early-soybean.jpg" alt="Soybean">
+        <h4>Soybean</h4>
+        <p>Major oilseed crop grown in <strong>Madhya Pradesh, Maharashtra, Rajasthan</strong>. Rich in protein.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🍎 Horticultural Crops -->
+  <section class="crop-section">
+    <h3>🍎 Horticultural Crops</h3>
+    <div class="crop-grid">
+      <div class="crop-card">
+        <img src="https://cdn.shopify.com/s/files/1/0039/6096/3118/files/hapus_tree_height.jpg?v=1739429208" alt="Mango">
+        <h4>Mango</h4>
+        <p>India's national fruit, grown widely in <strong>Uttar Pradesh, Bihar, Maharashtra</strong>.</p>
+      </div>
+
+      <div class="crop-card">
+        <img src="https://www.rainforest-alliance.org/wp-content/uploads/2021/07/banana-flower-fruit.jpg" alt="Banana">
+        <h4>Banana</h4>
+        <p>Cultivated in <strong>Tamil Nadu, Maharashtra, Kerala</strong> — a major export crop.</p>
+      </div>
+
+      <div class="crop-card">
+        <img src="https://5.imimg.com/data5/SELLER/Default/2020/11/FY/TO/EV/113068139/orange-plant-500x500.JPG" alt="Orange">
+        <h4>Orange</h4>
+        <p>Nagpur oranges famous in <strong>Maharashtra</strong>, also grown in <strong>Madhya Pradesh, Assam</strong>.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+.crop-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #f9fff7;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.2);
+  animation: fadeIn 1.2s ease-in-out;
+}
+.crop-container h2 {
+  text-align: center;
+  color: #2e7d32;
+  font-size: 2.4em;
+  margin-bottom: 15px;
+}
+.crop-container .intro {
+  text-align: center;
+  color: #4e342e;
+  max-width: 800px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.crop-section {
+  margin-bottom: 50px;
+}
+.crop-section h3 {
+  color: #1b5e20;
+  font-size: 1.8em;
+  margin-bottom: 25px;
+  text-align: center;
+}
+.crop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+.crop-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.crop-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+}
+.crop-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.crop-card h4 {
+  margin: 15px 0 5px;
+  color: #33691e;
+  text-align: center;
+  font-size: 1.3em;
+}
+.crop-card p {
+  text-align: center;
+  color: #4e342e;
+  padding: 0 15px 15px;
+  line-height: 1.5;
+}
+
+.reference {
+  text-align: center;
+  font-size: 1.1em;
+  margin-top: 40px;
+}
+.reference a {
+  color: #1b5e20;
+  font-weight: bold;
+  text-decoration: none;
+}
+.reference a:hover {
+  text-decoration: underline;
+  color: #2e7d32;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .crop-container { padding: 25px; }
+  .crop-card img { height: 150px; }
+}
+</style>
+{% endblock %}

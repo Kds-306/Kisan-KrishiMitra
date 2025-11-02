@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Rice - Agri Drain{% endblock %}
+
+{% block content %}
+<div class="crop-detail">
+  <h2>🌾 Rice (Oryza sativa)</h2>
+  <img src="https://t4.ftcdn.net/jpg/04/73/73/37/360_F_473733756_rS9ps9Ko6RcIj2j7G5FVLei4NdL9717r.jpg" alt="Rice">
+
+  <p>Rice is one of India’s staple food crops and the backbone of its food security. It grows best in regions with high temperature, heavy rainfall, and fertile alluvial soil.</p>
+
+  <h3>🔹 Major Producing States</h3>
+  <ul>
+    <li>West Bengal</li>
+    <li>Tamil Nadu</li>
+    <li>Punjab</li>
+    <li>Bihar</li>
+    <li>Uttar Pradesh</li>
+  </ul>
+
+  <h3>🌱 Growing Conditions</h3>
+  <p>Temperature: 20°C–35°C | Rainfall: 100–200 cm | Soil: Alluvial, Clayey Loam</p>
+
+  <h3>💧 Irrigation & Drainage</h3>
+  <p>Rice fields need standing water during most of the growth period, but excess waterlogging should be avoided for good root development.</p>
+
+  <h3>💡 Uses</h3>
+  <p>Consumed as staple food, used in rice bran oil, and animal feed industries.</p>
+
+  <a href="{{ url_for('crop') }}" class="back-link">← Back to Crops</a>
+</div>
+
+<style>
+.crop-detail {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #f9fff8;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.crop-detail img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+.crop-detail h2 {
+  color: #2e7d32;
+  text-align: center;
+}
+.crop-detail h3 {
+  margin-top: 20px;
+  color: #1b5e20;
+}
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #2e7d32;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+</style>
+{% endblock %}
